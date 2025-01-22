@@ -5,7 +5,6 @@ import com.qjewels.qjewels.dto.JewelDTO;
 import com.qjewels.qjewels.model.Auction;
 import com.qjewels.qjewels.model.Jewel;
 import com.qjewels.qjewels.model.TypeJewel;
-import com.qjewels.qjewels.model.Color;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,7 @@ public class JewelMapper {
                 jewel.getName(),
                 jewel.getTitle(),
                 jewel.getDescription(),
-                jewel.getColor() != null ? jewel.getColor().getName() : null,
+                jewel.getColorName(),
                 jewel.getKarat(),
                 jewel.getType() != null ? jewel.getType().getName() : null,
                 jewel.getEndDate(),
@@ -37,7 +36,7 @@ public class JewelMapper {
         );
     }
 
-    public static Jewel toEntity(JewelDTO jewelDTO, Optional<Auction> auction, TypeJewel type, Color color) {
+    public static Jewel toEntity(JewelDTO jewelDTO, Optional<Auction> auction, TypeJewel type) {
         Jewel jewel = new Jewel();
         jewel.setJewelId(jewelDTO.jewelId());
         jewel.setName(jewelDTO.name());
@@ -50,7 +49,7 @@ public class JewelMapper {
         jewel.setStartingPrice(jewelDTO.startingPrice());
         jewel.setPublished(jewelDTO.published());
         jewel.setAuction(auction.orElse(null));
-        jewel.setColor(color);
+        jewel.setColorName(jewelDTO.colorName());
         return jewel;
     }
 }

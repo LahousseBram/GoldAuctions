@@ -48,10 +48,15 @@ public class BidService implements IBidService {
 
         Jewel jewel = jewelRepository.findById(bidDto.jewelId())
                 .orElseThrow(() -> new IllegalArgumentException("Jewel not found"));
+        List<Bid> bids = jewel.getBids();
+        Bid lastBid = null;
 
-        Optional<Bid> lastBid = bidRepository.findTopByJewel_JewelIdOrderByTimestampDesc(bidDto.jewelId());
-        if (lastBid.isPresent() && lastBid.get().getUser().getUserId().equals(bidDto.userId())) {
-            throw new IllegalStateException("You cannot place consecutive bids. Please wait for another user to bid.");
+        if (!bids.isEmpty()) {
+            lastBid = bids.get(bids.size() - 1);
+
+            if (lastBid.getUser().getUserId().equals(bidDto.userId())) {
+                throw new IllegalStateException("You cannot place consecutive bids. Please wait for another user to bid.");
+            }
         }
 
         if (!validateBid(bidDto, jewel.getJewelId())) {
@@ -59,7 +64,6 @@ public class BidService implements IBidService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        System.out.println(jewel.getEndDate().minusMinutes(5).isBefore(now) && jewel.getEndDate().isAfter(now));
         if (jewel.getEndDate().minusMinutes(5).isBefore(now) && jewel.getEndDate().isAfter(now)) {
             jewel.setEndDate(jewel.getEndDate().plusMinutes(5));
             jewelRepository.save(jewel);
@@ -80,14 +84,14 @@ public class BidService implements IBidService {
         if (!jewel.isPublished() || jewel.getEndDate().isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("This auction has ended");
         }
+
+        if (bidDto.amount().longValue() < jewel.getStartingPrice().longValue()) {
+            throw new IllegalArgumentException("Bid needs to be bigger than the starting amount");
+        }
         
         Optional<Bid> latestBidOpt = bidRepository.findTopByJewel_JewelIdOrderByTimestampDesc(jewelId);
         if (latestBidOpt.isEmpty()) {
             return true;
-        }
-
-        if (bidDto.amount().longValue() < jewel.getStartingPrice().longValue()) {
-            throw new IllegalArgumentException("Bid needs to be bigger than the starting amount");
         }
 
         Bid latestBid = latestBidOpt.get();
@@ -121,9 +125,6 @@ public class BidService implements IBidService {
     @Transactional
     public void triggerAutoBids(long jewelId) {
         List<AutoBid> autoBids = autoBidRepository.findAllByJewel_JewelId(jewelId);
-        if (autoBids.size() <= 1) {
-            return;
-        }
 
         Jewel jewel = jewelRepository.findById(jewelId)
                 .orElseThrow(() -> new IllegalArgumentException("Jewel not found"));

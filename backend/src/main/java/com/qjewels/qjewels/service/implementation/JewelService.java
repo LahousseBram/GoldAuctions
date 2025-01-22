@@ -31,9 +31,6 @@ public class JewelService implements IJewelService {
     private ITypeJewelRepository typeJewelRepository;
 
     @Autowired
-    private IColorRepository colorRepository;
-
-    @Autowired
     private IBidService bidService;
 
     @Autowired
@@ -78,10 +75,7 @@ public class JewelService implements IJewelService {
         TypeJewel type = typeJewelRepository.findByName(jewelDTO.typeName())
                 .orElseThrow(() -> new IllegalArgumentException("Type not found: " + jewelDTO.typeName()));
 
-        Color color = colorRepository.findByName(jewelDTO.colorName())
-                .orElseThrow(() -> new IllegalArgumentException("Color not found: " + jewelDTO.colorName()));
-
-        Jewel jewel = JewelMapper.toEntity(jewelDTO, auction, type, color);
+        Jewel jewel = JewelMapper.toEntity(jewelDTO, auction, type);
         Jewel savedJewel = jewelRepository.save(jewel);
         return JewelMapper.toDto(savedJewel);
     }

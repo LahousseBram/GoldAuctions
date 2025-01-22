@@ -32,9 +32,7 @@ public class Jewel {
     @ElementCollection
     private List<String> imagePaths;
 
-    @ManyToOne
-    @JoinColumn(name = "color_id")
-    private Color color;
+    private String colorName;
 
     private int karat;
 

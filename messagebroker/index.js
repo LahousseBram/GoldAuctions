@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const amqp = require('amqplib');
 const WebSocket = require('ws');
@@ -55,7 +57,16 @@ class MessageListener {
                 return;
             }
 
-            this.rabbitMQConnection = await amqp.connect(process.env.URL || 'amqp://localhost');
+            const rabbitMQUrl = process.env.URL;
+
+            this.rabbitMQConnection = await amqp.connect(rabbitMQUrl, {
+                credentials: amqp.credentials.plain(
+                    process.env.RABBITMQ_USER ,
+                    process.env.RABBITMQ_PASSWORD
+                ),
+                servername: 'dog.lmq.cloudamqp.com'
+            });
+
             const channel = await this.rabbitMQConnection.createChannel();
             const queueName = process.env.QUEUE || 'default_queue';
 
@@ -104,7 +115,8 @@ class MessageListener {
             });
 
         } catch (error) {
-            console.error('RabbitMQ Connection Error:', error);
+            console.error('RabbitMQ Connection Error:', error.message);
+            console.log('Retrying connection in 5 seconds...');
             this.rabbitMQConnection = null;
             setTimeout(() => this.connectRabbitMQ(), 5000);
         }

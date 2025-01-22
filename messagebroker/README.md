@@ -7,8 +7,7 @@ This repository sets up a WebSocket server integrated with a RabbitMQ message br
 ## Prerequisites
 
 ## Key Files
-- index.js: The main application file that sets up the WebSocket server and RabbitMQ integration.
-- .env: The main file holding the environment variables
+index.js: The main application file that sets up the WebSocket server and RabbitMQ integration.
 
 ## Troubleshooting
 1. RabbitMQ Connection Issues:
@@ -19,6 +18,22 @@ This repository sets up a WebSocket server integrated with a RabbitMQ message br
 
 - Verify that the queue specified in QUEUE is active and receiving messages.
 - Confirm clients are connected and ready to receive data.
+
+
+### Environment Variables
+Ensure the following environment variables are set before starting the server:
+
+- **`URL`**: RabbitMQ connection URL  
+  Example:  
+  `amqps://nrchltxo:RzG_S_WoSb_NGhtOI5YciIuVofbHyOBe@dog.lmq.cloudamqp.com/nrchltxo`
+
+- **`QUEUE`**: The name of the RabbitMQ queue to listen to  
+  Example:  
+  `GoldAuctions`
+
+If these variables are not set, the application defaults to:
+- `URL`: `amqp://localhost`
+- `QUEUE`: `default_queue`
 
 ## How It Works
 
@@ -42,26 +57,9 @@ This repository sets up a WebSocket server integrated with a RabbitMQ message br
 
 1. **Clone the repository**:
  ```bash
- git clone https://github.com/LahousseBram/GoldAuctions.git
- cd messagebroker
-```
+ git clone [https://gitlab.ti.howest.be/ti/2024-2025/s5/project-iv/projecten/project-14/messagebroker](https://gitlab.ti.howest.be/ti/2024-2025/s5/project-iv/projecten/project-14/messagebroker)
 
-2. **Install dependencies**:
+
+## Install Dependencies:
 ```bash
 npm install
-```
-
-3. **Create .env file**:
-```yaml
-URL = {FULL URL TO CONNECT MESSAGEBROKER}
-QUEUE = GoldAuctions
-```
-
-If these variables are not set, the application defaults to:
-- `URL`: `amqp://localhost`
-- `QUEUE`: `default_queue`
-
-4. **Start the messagebroker**:
-```bash
-node --env-file=.env index.js
-```
